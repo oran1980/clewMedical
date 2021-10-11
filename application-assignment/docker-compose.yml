@@ -1,0 +1,71 @@
+version: "3.8"
+
+services:
+#  consumer:
+#    build:
+#      context: ./ConsumerService
+#    environment:
+#      RABBIT_HOST: rabbitmq
+#      RABBIT_USER: admin
+#      RABBIT_PASS: password
+#    depends_on:
+#     - rabbitmq
+  consumer:
+    build:
+      context:
+        ./ConsumerService
+    environment:
+#      RABBIT_HOST: rabbitmq
+      RABBIT_HOST: locahost
+      RABBIT_USER: admin
+      RABBIT_PASS: password
+    depends_on:
+      - rabbitmq
+      - postgresdb
+  publisher:
+    build:
+      context: ./PublisherService
+    environment:
+#      RABBIT_HOST: rabbitmq
+      RABBIT_HOST: locahost
+      RABBIT_USER: admin
+      RABBIT_PASS: password
+    depends_on:
+      - rabbitmq
+
+  rabbitmq:
+    image: rabbitmq:3.8.1-management
+#    container_name: rabbitmq
+    environment:
+      RABBITMQ_DEFAULT_USER: admin
+      RABBITMQ_DEFAULT_PASS: password
+    ports:
+      - 5672:5672
+      - 15672:15672
+
+  postgresdb:
+    image: postgres:12.0
+    container_name: postgresdb
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_DB: clew_medical
+      POSTGRES_PASSWORD: password
+      PGDATA: var/lib/postgresql/data/pgdata
+    volumes:
+      - ./data/postgres:/var/lib/postgresql/data/pgdata
+    ports:
+      - "5432:5432"
+#  pgadmin:
+#    image: dpage/pgadmin4:5.7
+#    restart: always
+#    environment:
+#      PGADMIN_DEFAULT_EMAIL: oran.bar.natan@gmail.com
+#      PGADMIN_DEFAULT_PASSWORD: secret
+#      PGADMIN_LISTEN_PORT: 80
+#      PGDATA: /var/lib/pgadmin
+#    ports:
+#      - "8080:80"
+#    volumes:
+#      - ./data/postgres:/var/lib/pgadmin
+#    links:
+#      - "postgresdb:pgsql-server"
